@@ -65,3 +65,4 @@ def create_entry():
 {% endblock %}
 ```
 9. Flask query strings : https://youtube.com/watch?v=PL6wzmKrgRg&feature=shares
+10. Flask app configuration : https://youtube.com/watch?v=GW_2O9CrnSU&feature=shares
