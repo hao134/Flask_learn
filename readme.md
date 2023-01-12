@@ -66,3 +66,4 @@ def create_entry():
 ```
 9. Flask query strings : https://youtube.com/watch?v=PL6wzmKrgRg&feature=shares
 10. Flask app configuration : https://youtube.com/watch?v=GW_2O9CrnSU&feature=shares
+11. Uploading files with Flask : https://youtube.com/watch?v=6WruncSoCdI&feature=shares
