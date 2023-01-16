@@ -230,49 +230,78 @@ def upload_image():
 
     return render_template("public/upload_image.html")
 
-from flask import send_from_directory, abort
+# from flask import send_from_directory, abort
 
-"""
-string:
-int:
-float:
-path:
-uuid:
-"""
+# """
+# string:
+# int:
+# float:
+# path:
+# uuid:
+# """
 
-app.config["CLIENT_IMAGES"] = "/Users/shihhao/Desktop/Projects/Python/flask_app/app/static/client/img"
-app.config["CLIENT_CSV"] = "/Users/shihhao/Desktop/Projects/Python/flask_app/app/static/client/csv"
-app.config["CLIENT_REPORTS"] = "/Users/shihhao/Desktop/Projects/Python/flask_app/app/static/client/reports"
+# app.config["CLIENT_IMAGES"] = "/Users/shihhao/Desktop/Projects/Python/flask_app/app/static/client/img"
+# app.config["CLIENT_CSV"] = "/Users/shihhao/Desktop/Projects/Python/flask_app/app/static/client/csv"
+# app.config["CLIENT_REPORTS"] = "/Users/shihhao/Desktop/Projects/Python/flask_app/app/static/client/reports"
 
-@app.route("/get-image/<image_name>")
-def get_image(image_name):
+# @app.route("/get-image/<image_name>")
+# def get_image(image_name):
 
-    try:
-        return send_from_directory(
-            app.config["CLIENT_IMAGES"], filename=image_name, as_attachment=False
+#     try:
+#         return send_from_directory(
+#             app.config["CLIENT_IMAGES"], filename=image_name, as_attachment=False
+#         )
+#     except FileNotFoundError:
+#         abort(404)
+
+#     return "Thanks"
+
+# @app.route("/get-csv/<filename>")
+# def get_csv(filename):
+
+#     try:
+#         return send_from_directory(
+#             app.config["CLIENT_CSV"], filename=filename, as_attachment=False
+#         )
+#     except FileNotFoundError:
+#         abort(404)
+
+#     return "Thanks"
+
+# @app.route("/get-report/<path:path>")
+# def get_csv(path):
+#     try:
+#         return send_from_directory(
+#             app.config["CLIENT_REPORTS"], filename=path, as_attachment=True
+#         )
+#     except FileNotFoundError:
+#         abort(404)
+
+## =================== Cookies =======================
+
+@app.route("/cookies")
+def cookies():
+
+    res = make_response("cookies",200)
+    
+    cookies = request.cookies
+    flavor = cookies.get("flavor")
+    type = cookies.get("chocolate type")
+    chewy = cookies.get("chewy")
+    print(cookies)
+    print(flavor, type, chewy)
+    res.set_cookie(
+        "flavor", 
+        value="chocolate chip",
+        max_age=10,
+        expires=None,
+        path=request.path,
+        domain=None,
+        secure=False,
+        httponly=False,
+        samesite=None  # set None -> the cookie will be accessible over multiple domains
         )
-    except FileNotFoundError:
-        abort(404)
+    res.set_cookie("chocolate type", "dark")
+    res.set_cookie("chewy", "yes")
 
-    return "Thanks"
-
-@app.route("/get-csv/<filename>")
-def get_csv(filename):
-
-    try:
-        return send_from_directory(
-            app.config["CLIENT_CSV"], filename=filename, as_attachment=False
-        )
-    except FileNotFoundError:
-        abort(404)
-
-    return "Thanks"
-
-@app.route("/get-report/<path:path>")
-def get_csv(path):
-    try:
-        return send_from_directory(
-            app.config["CLIENT_REPORTS"], filename=path, as_attachment=True
-        )
-    except FileNotFoundError:
-        abort(404)
+    return res
