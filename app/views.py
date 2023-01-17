@@ -1,6 +1,6 @@
 from app import app
 
-from flask import render_template, request, redirect, jsonify, make_response
+from flask import render_template, request, redirect, jsonify, make_response, session, url_for
 
 from datetime import datetime
 
@@ -112,16 +112,6 @@ users = {
         "twitter_handle" : "@elonmusk"
     }
 }
-
-@app.route("/profile/<username>")
-def profile(username):
-
-    user = None
-
-    if username in users:
-        user = users[username]
-
-    return render_template("public/profile.html", username=username, user=user)
 
 @app.route("/multiple/<foo>/<bar>/<baz>")
 def multi(foo, bar, baz):
@@ -305,3 +295,64 @@ def cookies():
     res.set_cookie("chewy", "yes")
 
     return res
+
+## =================== Session =======================
+app.config["SECRET_KEY"] = "2eLAx4kgkuoJhcgq-cIJHA"
+
+users = {
+    "julian" : {
+        "username" : "julian",
+        "email" : "julian@gmail.com",
+        "password" : "example",
+        "bio" : "some guy from the internet"
+    },
+    "clarissa" : {
+        "username" : "clarissa",
+        "email": "clarissa@icloud.com",
+        "password" : "sweetpostato22",
+        "bio" : "sweet potato is life"
+    },
+}
+
+@app.route("/sign-in", methods=["GET", "POST"])
+def sign_in():
+
+    if request.method == "POST": 
+        req = request.form 
+        username = req.get("username")
+        password = req.get("password")
+
+        if not username in users:
+            print("username not found")
+            return redirect(request.url)
+        else:
+            user = users[username]
+        
+        if not password == user["password"]:
+            print("Password incorrect")
+            return redirect(request.url)
+
+        else:
+            session["USERNAME"] = user["username"]
+            print(session)
+            print("User added to session")
+            return redirect(url_for("profile"))
+
+    return render_template("public/sign_in.html")
+
+@app.route("/profile")
+def profile():
+
+    if session.get("USERNAME", None) is not None:
+        username = session.get("USERNAME")
+        user = users[username]
+        return render_template("public/profile.html", user=user)
+
+    else:
+        print("Username not found in session")
+        return redirect(url_for("sign_in"))
+
+@app.route("/sign-out")
+def sign_out():
+    session.pop("USERNAME", None)
+    return redirect(url_for("sign_in"))
