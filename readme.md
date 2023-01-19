@@ -70,3 +70,4 @@ def create_entry():
 12. Sending files : https://youtube.com/watch?v=QjpbWAirMWw&feature=shares
 13. Flask cookies : https://youtube.com/watch?v=3HVNRgvi5BY&feature=shares
 14. The Flask session object : https://youtube.com/watch?v=PYILMiGxpAU&feature=shares
+15. Message flashing & notifications with Flask : https://youtube.com/watch?v=T1PLBEEZU8o&feature=shares

@@ -1,6 +1,6 @@
 from app import app
 
-from flask import render_template, request, redirect, jsonify, make_response, session, url_for
+from flask import render_template, request, redirect, jsonify, make_response, session, url_for, flash
 
 from datetime import datetime
 
@@ -77,23 +77,22 @@ def jinja():
 def about():
     return "<h1 style='color:red'>About!</h1>"
 
-@app.route("/sign-up", methods=["GET","POST"])
-def sign_up():
+# @app.route("/sign-up", methods=["GET","POST"])
+# def sign_up():
 
-    if request.method == "POST":
+#     if request.method == "POST":
 
-        req = request.form 
+#         req = request.form 
 
-        username = req["username"]
-        email = req.get("email")
-        password = request.form["password"]
+#         username = req["username"]
+#         email = req.get("email")
+#         password = request.form["password"]
 
-        print(username, email, password)
+#         print(username, email, password)
 
-        return redirect(request.url)
+#         return redirect(request.url)
 
-    return render_template("public/sign_up.html")
-
+#     return render_template("public/sign_up.html")
 
 users = {
     "mitsuhiko" : {
@@ -356,3 +355,26 @@ def profile():
 def sign_out():
     session.pop("USERNAME", None)
     return redirect(url_for("sign_in"))
+
+
+########### Message flashing & notifications with Flask ################
+@app.route("/sign-up", methods=["GET","POST"])
+def sign_up():
+
+    if request.method == "POST":
+
+        req = request.form 
+
+        username = req.get("username")
+        email = req.get("email")
+        password = req.get("password")
+
+        #print(username, email, password)
+        if not len(password) >= 8:
+            flash("Password must be at least 8 characters in length", "warning")
+            return redirect(request.url)
+
+        flash("Account created", "success")
+        return redirect(request.url)
+
+    return render_template("public/sign_up.html")
