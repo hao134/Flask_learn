@@ -1,6 +1,6 @@
 from app import app
 
-from flask import render_template, request, redirect, jsonify, make_response, session, url_for, flash
+from flask import render_template, request, redirect, jsonify, make_response, session, url_for, flash, abort
 
 from datetime import datetime
 
@@ -14,10 +14,7 @@ def clean_date(dt):
 
 @app.route("/")
 def index():
-
-    # print(f"Flask ENV is set to: {app.config['ENV']}")
-    # print(app.config["DB_NAME"])
-
+    
     return render_template("public/index.html")
 
 @app.route("/jinja")
