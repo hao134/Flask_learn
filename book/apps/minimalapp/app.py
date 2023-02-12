@@ -1,6 +1,32 @@
-from flask import Flask, current_app, g, render_template, request, url_for
+import os
+
+from email_validator import EmailNotValidError, validate_email
+from flask import (
+    Flask,
+    current_app,
+    flash,
+    g,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
+from flask_mail import Mail, Message
 
 app = Flask(__name__)
+# add secret key
+app.config["SECRET_KEY"] = "2AZSMss3p5QPbcY2hBsJ"
+
+# 增加mail類別的組態
+app.config["MAIL_SERVER"] = os.environ.get("MAIL_SERVER")
+app.config["MAIL_PORT"] = os.environ.get("MAIL_PORT")
+app.config["MAIL_USE_TLS"] = os.environ.get("MAIL_USE_TLS")
+app.config["MAIL_USERNAME"] = os.environ.get("MAIL_USERNAME")
+app.config["MAIL_PASSWORD"] = os.environ.get("MAIL_PASSWORD")
+app.config["MAIL_DEFAULT_SENDER"] = os.environ.get("MAIL_DEFAULT_SENDER")
+
+# 登錄flask-mail擴充套件
+mail = Mail(app)
 
 
 @app.route("/")
@@ -42,3 +68,61 @@ print(g.connection)
 with app.test_request_context("/users?updated=true"):
     # output true
     print(request.args.get("updated"))
+
+
+@app.route("/contact")
+def contact():
+    return render_template("contact.html")
+
+
+@app.route("/contact/complete", methods=["GET", "POST"])
+def contact_complete():
+    if request.method == "POST":
+        # use form to get form's value
+        username = request.form["username"]
+        email = request.form["email"]
+        description = request.form["description"]
+
+        # input detection:
+        is_valid = True
+
+        if not username:
+            flash("必須填寫使用者名稱")
+            is_valid = False
+        if not email:
+            flash("必須填寫郵件位址")
+            is_valid = False
+        try:
+            validate_email(email)
+        except EmailNotValidError:
+            flash("請輸入正確的郵件格式")
+            is_valid = False
+
+        if not description:
+            flash("必須填寫諮詢內容")
+            is_valid = False
+
+        if not is_valid:
+            return redirect(url_for("contact"))
+        # 傳送郵件
+        send_email(
+            email,
+            "感謝您來信詢問。",
+            "contact_mail",
+            username=username,
+            description=description,
+        )
+
+        # redirect to contact endpoint
+        flash("諮詢內容已傳送。感謝您來信諮詢")
+        return redirect(url_for("contact_complete"))
+
+    return render_template("contact_complete.html")
+
+
+def send_email(to, subject, template, **kwargs):
+    """傳送郵件的函數"""
+    msg = Message(subject, recipients=[to])
+    msg.body = render_template(template + ".txt", **kwargs)
+    msg.html = render_template(template + ".html", **kwargs)
+    mail.send(msg)
