@@ -1,3 +1,4 @@
+import logging
 import os
 
 from email_validator import EmailNotValidError, validate_email
@@ -6,16 +7,24 @@ from flask import (
     current_app,
     flash,
     g,
+    make_response,
     redirect,
     render_template,
     request,
+    session,
     url_for,
 )
+from flask_debugtoolbar import DebugToolbarExtension
 from flask_mail import Mail, Message
 
 app = Flask(__name__)
 # add secret key
 app.config["SECRET_KEY"] = "2AZSMss3p5QPbcY2hBsJ"
+app.logger.setLevel(logging.DEBUG)
+# 避免中斷重新導向
+app.config["DEBUG_TB_INTERCEPT_REDIRECTS"] = False
+# 在debugtoolbarextension 設置應用程式
+toolbar = DebugToolbarExtension(app)
 
 # 增加mail類別的組態
 app.config["MAIL_SERVER"] = os.environ.get("MAIL_SERVER")
@@ -72,7 +81,16 @@ with app.test_request_context("/users?updated=true"):
 
 @app.route("/contact")
 def contact():
-    return render_template("contact.html")
+    # get response item
+    response = make_response(render_template("contact.html"))
+
+    # setting cookie
+    response.set_cookie("flaskbook key", "flaskbook value")
+
+    # setting session
+    session["username"] = "ichiro"
+
+    return response
 
 
 @app.route("/contact/complete", methods=["GET", "POST"])
